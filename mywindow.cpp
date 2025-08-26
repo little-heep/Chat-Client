@@ -9,14 +9,15 @@ MyWindow::MyWindow(QString id,QString name,client *c,QWidget *parent)
     m_name=name;
     clen = c;
 
-    db=new DBManage;
+    db = new DBManage;
+
     db->initDatabase();
     // 主窗口设置
     setWindowTitle("客户端");
     resize(800, 600);
 
     // 主部件和布局
-    centralWidget = new QWidget;
+    centralWidget = new QWidget(this);
     QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -39,23 +40,28 @@ MyWindow::MyWindow(QString id,QString name,client *c,QWidget *parent)
     // 为每个菜单项创建对应的内容页面
     for (int i = 0; i < menuItems.size(); ++i) {
         if(i==0){
-            msgwidget=new MessageWidget(m_id,clen,this);
+            msgwidget=new MessageWidget(m_id,clen,stackedWidget);
             stackedWidget->addWidget(msgwidget);
+            connect(msgwidget,SIGNAL(addfriendbyid(QString)),this,SLOT(onaddfriendbyid(QString)));
+            connect(msgwidget,SIGNAL(addfriendbyname(QString)),this,SLOT(onaddfriendbyname(QString)));
+
         }
         else if(i==1)
         {
             QWidget *page=createFriendPage();
             stackedWidget->addWidget(page);
+
         }
         else if(i==4)
         {
             //创建个人信息编辑页面
-            personwidget=new PersonalWidget(m_id,name,this);
+            personwidget=new PersonalWidget(m_id,name,stackedWidget);
             connect(personwidget,SIGNAL(changename(QString)),this,SLOT(onchangename(QString)));
             connect(personwidget,SIGNAL(changepwd(QString,QString)),this,SLOT(onchangepwd(QString,QString)));
             connect(clen,SIGNAL(changenamestatus(QString)),personwidget,SLOT(namechangestatus(QString)));
             connect(clen,SIGNAL(changepwdstatus(QString,QString)),personwidget,SLOT(pwdchangestatus(QString,QString)));
             stackedWidget->addWidget(personwidget);
+
         }
         else{
             QWidget *page = createContentPage(menuItems[i]);
@@ -69,6 +75,9 @@ MyWindow::MyWindow(QString id,QString name,client *c,QWidget *parent)
 
     connect(clen,&client::updatefriend,this,&MyWindow::showfriend);
 
+    connect(clen,&client::addfriendrequest,this,&MyWindow::onaddfriendrequest);
+    connect(clen,&client::addfriendresult,this,&MyWindow::onaddfriendresult);
+    connect(clen,&client::acceptfriend,this,&MyWindow::onacceptfriend);
 
     // 默认选中第一个菜单项
     menuList->setCurrentRow(0);
@@ -83,17 +92,19 @@ MyWindow::MyWindow(QString id,QString name,client *c,QWidget *parent)
 
 }
 
-MyWindow::~MyWindow() {}
+MyWindow::~MyWindow() {
+    if (db) {
+        delete db;
+        db = nullptr;
+    }
+}
 
 QWidget* MyWindow::createFriendPage()
 {
     QWidget *page=new QWidget;
     QVBoxLayout *layout=new QVBoxLayout(page);
-    allfriend=new QListWidget(page);
-
+    allfriend=new QListWidget;
     QLabel *lab=new QLabel("联系人");
-
-    allfriend->addItem("我自己");
 
     layout->addWidget(lab);
     layout->addWidget(allfriend);
@@ -145,11 +156,25 @@ QWidget* MyWindow::createContentPage(const QString &title) {
 
  void MyWindow::showfriend(FriendListMessage f)
 {
-     msgwidget->initfriend(f);
-
-    for (const auto& friendInfo : f.friends) {
-         FriendListItem *friendItem = new FriendListItem(friendInfo);
-         allfriend->addItem(friendItem);
+     qDebug()<<"showfriend begin";
+    // 检查 msgwidget 是否为空，如果不为空则初始化好友
+    if(msgwidget != nullptr) {
+        msgwidget->initfriend(f);
+        qDebug() << "msgwidget初始化好友";
+    } else {
+        qDebug() << "msgwidget为空";
+    }
+    
+    // 检查 allfriend 是否为空，如果不为空则添加好友项
+    if(allfriend != nullptr) {
+        for (const auto& friendInfo : f.friends) {
+            FriendListItem *friendItem = new FriendListItem(friendInfo);
+            if(friendItem != nullptr) {
+                allfriend->addItem(friendItem);
+            }
+        }
+    } else {
+        qDebug() << "allfriend为空";
     }
 }
 
@@ -225,4 +250,62 @@ void MyWindow::onchangename(QString newname)//修改昵称
 
     //发送消息
     clen->sendJsonMessage(json);
+}
+
+void MyWindow::onaddfriendbyid(QString id)
+{
+    QJsonObject json;
+
+    json["type"] = "addfriend";        // 消息类型标识
+    json["addname"]="";
+    json["addid"]=id;
+
+    //发送消息
+    clen->sendJsonMessage(json);
+}
+
+void MyWindow::onaddfriendbyname(QString name)
+{
+    QJsonObject json;
+
+    json["type"] = "addfriend";        // 消息类型标识
+    json["addname"]=name;
+    json["addid"]="";
+
+    //发送消息
+    clen->sendJsonMessage(json);
+}
+
+void MyWindow::onaddfriendresult(bool ok,QString detail)
+{
+    if(ok)
+        QMessageBox::information(this,"发送好友请求成功",detail);
+    else
+        QMessageBox::critical(this,"发送好友请求失败",detail);
+}
+
+void MyWindow::onaddfriendrequest(FriendInfo friendinfo)
+{
+    QString detail="用户"+friendinfo.name+"("+friendinfo.userID+")请求添加为好友\n是否同意?";
+    QMessageBox::StandardButton result=QMessageBox::information(this,"好友请求",detail,QMessageBox::Yes|QMessageBox::No);
+    if(result == QMessageBox::Yes)
+    {
+        FriendListItem *friendItem = new FriendListItem(friendinfo);
+        allfriend->addItem(friendItem);
+        msgwidget->addfriend(friendinfo);
+
+        QJsonObject json;
+        json["type"] = "acceptfriend";        // 消息类型标识
+        json["addname"]=friendinfo.name;
+        //发送消息
+        clen->sendJsonMessage(json);
+    }
+
+}
+
+void MyWindow::onacceptfriend(FriendInfo friendinfo)
+{
+    FriendListItem *friendItem = new FriendListItem(friendinfo);
+    allfriend->addItem(friendItem);
+    msgwidget->addfriend(friendinfo);
 }

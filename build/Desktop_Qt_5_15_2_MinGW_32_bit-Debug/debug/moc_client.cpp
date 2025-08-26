@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_client_t {
-    QByteArrayData data[24];
-    char stringdata0[263];
+    QByteArrayData data[31];
+    char stringdata0[336];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -51,11 +51,18 @@ QT_MOC_LITERAL(15, 142, 15), // "changepwdstatus"
 QT_MOC_LITERAL(16, 158, 5), // "statu"
 QT_MOC_LITERAL(17, 164, 3), // "msg"
 QT_MOC_LITERAL(18, 168, 16), // "changenamestatus"
-QT_MOC_LITERAL(19, 185, 11), // "handleError"
-QT_MOC_LITERAL(20, 197, 28), // "QAbstractSocket::SocketError"
-QT_MOC_LITERAL(21, 226, 11), // "socketError"
-QT_MOC_LITERAL(22, 238, 8), // "readData"
-QT_MOC_LITERAL(23, 247, 15) // "receiveFileData"
+QT_MOC_LITERAL(19, 185, 15), // "addfriendresult"
+QT_MOC_LITERAL(20, 201, 2), // "ok"
+QT_MOC_LITERAL(21, 204, 6), // "detail"
+QT_MOC_LITERAL(22, 211, 16), // "addfriendrequest"
+QT_MOC_LITERAL(23, 228, 10), // "FriendInfo"
+QT_MOC_LITERAL(24, 239, 5), // "finfo"
+QT_MOC_LITERAL(25, 245, 12), // "acceptfriend"
+QT_MOC_LITERAL(26, 258, 11), // "handleError"
+QT_MOC_LITERAL(27, 270, 28), // "QAbstractSocket::SocketError"
+QT_MOC_LITERAL(28, 299, 11), // "socketError"
+QT_MOC_LITERAL(29, 311, 8), // "readData"
+QT_MOC_LITERAL(30, 320, 15) // "receiveFileData"
 
     },
     "client\0messageLogged\0\0sendid\0receiveid\0"
@@ -63,8 +70,10 @@ QT_MOC_LITERAL(23, 247, 15) // "receiveFileData"
     "FriendListMessage\0message\0loginsucess\0"
     "id\0loginfail\0fileReceived\0filePath\0"
     "changepwdstatus\0statu\0msg\0changenamestatus\0"
-    "handleError\0QAbstractSocket::SocketError\0"
-    "socketError\0readData\0receiveFileData"
+    "addfriendresult\0ok\0detail\0addfriendrequest\0"
+    "FriendInfo\0finfo\0acceptfriend\0handleError\0"
+    "QAbstractSocket::SocketError\0socketError\0"
+    "readData\0receiveFileData"
 };
 #undef QT_MOC_LITERAL
 
@@ -74,26 +83,29 @@ static const uint qt_meta_data_client[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      10,   14, // methods
+      13,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       7,       // signalCount
+      10,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    4,   64,    2, 0x06 /* Public */,
-       7,    1,   73,    2, 0x06 /* Public */,
-      10,    1,   76,    2, 0x06 /* Public */,
-      12,    1,   79,    2, 0x06 /* Public */,
-      13,    2,   82,    2, 0x06 /* Public */,
-      15,    2,   87,    2, 0x06 /* Public */,
-      18,    1,   92,    2, 0x06 /* Public */,
+       1,    4,   79,    2, 0x06 /* Public */,
+       7,    1,   88,    2, 0x06 /* Public */,
+      10,    1,   91,    2, 0x06 /* Public */,
+      12,    1,   94,    2, 0x06 /* Public */,
+      13,    2,   97,    2, 0x06 /* Public */,
+      15,    2,  102,    2, 0x06 /* Public */,
+      18,    1,  107,    2, 0x06 /* Public */,
+      19,    2,  110,    2, 0x06 /* Public */,
+      22,    1,  115,    2, 0x06 /* Public */,
+      25,    1,  118,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-      19,    1,   95,    2, 0x08 /* Private */,
-      22,    0,   98,    2, 0x08 /* Private */,
-      23,    0,   99,    2, 0x08 /* Private */,
+      26,    1,  121,    2, 0x08 /* Private */,
+      29,    0,  124,    2, 0x08 /* Private */,
+      30,    0,  125,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::QDateTime,    3,    4,    5,    6,
@@ -103,9 +115,12 @@ static const uint qt_meta_data_client[] = {
     QMetaType::Void, QMetaType::QString, QMetaType::QString,    3,   14,
     QMetaType::Void, QMetaType::QString, QMetaType::QString,   16,   17,
     QMetaType::Void, QMetaType::QString,   16,
+    QMetaType::Void, QMetaType::Bool, QMetaType::QString,   20,   21,
+    QMetaType::Void, 0x80000000 | 23,   24,
+    QMetaType::Void, 0x80000000 | 23,   24,
 
  // slots: parameters
-    QMetaType::Void, 0x80000000 | 20,   21,
+    QMetaType::Void, 0x80000000 | 27,   28,
     QMetaType::Void,
     QMetaType::Void,
 
@@ -125,15 +140,18 @@ void client::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
         case 4: _t->fileReceived((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2]))); break;
         case 5: _t->changepwdstatus((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
         case 6: _t->changenamestatus((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 7: _t->handleError((*reinterpret_cast< QAbstractSocket::SocketError(*)>(_a[1]))); break;
-        case 8: _t->readData(); break;
-        case 9: _t->receiveFileData(); break;
+        case 7: _t->addfriendresult((*reinterpret_cast< bool(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
+        case 8: _t->addfriendrequest((*reinterpret_cast< FriendInfo(*)>(_a[1]))); break;
+        case 9: _t->acceptfriend((*reinterpret_cast< FriendInfo(*)>(_a[1]))); break;
+        case 10: _t->handleError((*reinterpret_cast< QAbstractSocket::SocketError(*)>(_a[1]))); break;
+        case 11: _t->readData(); break;
+        case 12: _t->receiveFileData(); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
         switch (_id) {
         default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-        case 7:
+        case 10:
             switch (*reinterpret_cast<int*>(_a[1])) {
             default: *reinterpret_cast<int*>(_a[0]) = -1; break;
             case 0:
@@ -192,6 +210,27 @@ void client::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
                 return;
             }
         }
+        {
+            using _t = void (client::*)(bool , QString );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&client::addfriendresult)) {
+                *result = 7;
+                return;
+            }
+        }
+        {
+            using _t = void (client::*)(FriendInfo );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&client::addfriendrequest)) {
+                *result = 8;
+                return;
+            }
+        }
+        {
+            using _t = void (client::*)(FriendInfo );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&client::acceptfriend)) {
+                *result = 9;
+                return;
+            }
+        }
     }
 }
 
@@ -224,13 +263,13 @@ int client::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 10)
+        if (_id < 13)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 10;
+        _id -= 13;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 10)
+        if (_id < 13)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 10;
+        _id -= 13;
     }
     return _id;
 }
@@ -282,6 +321,27 @@ void client::changenamestatus(QString _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 6, _a);
+}
+
+// SIGNAL 7
+void client::addfriendresult(bool _t1, QString _t2)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
+    QMetaObject::activate(this, &staticMetaObject, 7, _a);
+}
+
+// SIGNAL 8
+void client::addfriendrequest(FriendInfo _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 8, _a);
+}
+
+// SIGNAL 9
+void client::acceptfriend(FriendInfo _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 9, _a);
 }
 QT_WARNING_POP
 QT_END_MOC_NAMESPACE

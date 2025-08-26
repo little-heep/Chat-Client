@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QWidget>
+#include <QMessageBox>
 #include <QLabel>
 #include <QPushButton>
 #include <QTextEdit>
@@ -66,6 +67,13 @@ private slots:
 
     void onchangepwd(QString oldpwd,QString newpwd);//修改密码
     void onchangename( QString newname);//修改昵称
+
+    void onaddfriendbyid(QString id);
+    void onaddfriendbyname(QString name);
+
+    void onaddfriendresult(bool,QString);
+    void onaddfriendrequest(FriendInfo);
+    void onacceptfriend(FriendInfo);
 
 signals:
 

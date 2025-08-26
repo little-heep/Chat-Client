@@ -116,15 +116,95 @@ void client::readData() {
             changepwdcheck(jsonData);
         else if (type=="changename_response")
             changenamecheck(jsonData);
+        else if(type=="addfriend_response")
+            addfriendcheck(jsonData);
+        else if(type=="addfriend_request")
+            addfriendnotify(jsonData);
+        else if (type=="acceptfriend_response")
+            acceptfriendresponse(jsonData);
         else if (type == "another_type") { // 对应于另一种消息类型的type值
             // 解析并处理另一种类型的消息
-
         }
         else {
             qDebug() << "Unknown message type:" << type;
         }
     }
 }
+
+void client::acceptfriendresponse(const QByteArray & jsonData)
+{
+    QJsonParseError parseError;
+    const QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
+
+    // 检查JSON解析是否出错
+    if (parseError.error != QJsonParseError::NoError) {
+        qWarning() << "JSON解析错误:" << parseError.errorString();
+        return ;
+    }
+
+    if (!doc.isObject()) {
+        qWarning() << "JSON数据不是对象格式";
+        return;
+    }
+
+    const QJsonObject jsonObj = doc.object();
+    FriendInfo finfo;
+    finfo.name=jsonObj["username"].toString();
+    finfo.status=jsonObj["userstatus"].toInt();
+    finfo.online=jsonObj["online"].toBool();
+    finfo.userID=jsonObj["userid"].toString();
+    emit acceptfriend(finfo);
+}
+
+void client::addfriendcheck(const QByteArray & jsonData)
+{
+    QJsonParseError parseError;
+    const QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
+
+    // 检查JSON解析是否出错
+    if (parseError.error != QJsonParseError::NoError) {
+        qWarning() << "JSON解析错误:" << parseError.errorString();
+        return ;
+    }
+
+    if (!doc.isObject()) {
+        qWarning() << "JSON数据不是对象格式";
+        return;
+    }
+
+    const QJsonObject jsonObj = doc.object();
+    if(jsonObj["status"]=="success")
+        emit addfriendresult(true,jsonObj["message"].toString());
+    else
+        emit addfriendresult(false,jsonObj["message"].toString());
+
+}
+
+void client::addfriendnotify(const QByteArray & jsonData)
+{
+    QJsonParseError parseError;
+    const QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
+
+    // 检查JSON解析是否出错
+    if (parseError.error != QJsonParseError::NoError) {
+        qWarning() << "JSON解析错误:" << parseError.errorString();
+        return ;
+    }
+
+    if (!doc.isObject()) {
+        qWarning() << "JSON数据不是对象格式";
+        return;
+    }
+
+    const QJsonObject jsonObj = doc.object();
+    FriendInfo finfo;
+    finfo.name=jsonObj["addname"].toString();
+    finfo.status=jsonObj["status"].toInt();
+    finfo.online=jsonObj["online"].toBool();
+    finfo.userID=jsonObj["addid"].toString();
+    emit addfriendrequest(finfo);
+}
+
 
 void client::changenamecheck(const QByteArray & jsonData)
 {

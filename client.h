@@ -39,7 +39,9 @@ signals:
     void fileReceived(const QString sendid,const QString filePath);
     void changepwdstatus(QString statu,QString msg);
     void changenamestatus(QString statu);
-
+    void addfriendresult(bool ok,QString detail);
+    void addfriendrequest(FriendInfo finfo);
+    void acceptfriend(FriendInfo finfo);
 private:
     QString aimip;
     QString aimport;
@@ -57,6 +59,10 @@ private:
     void logincheck(const QByteArray &jsonData);
     void changepwdcheck(const QByteArray & jsonData);
     void changenamecheck(const QByteArray & jsonData);
+
+    void addfriendcheck(const QByteArray & jsonData);
+    void addfriendnotify(const QByteArray & jsonData);
+    void acceptfriendresponse(const QByteArray & jsonData);
 
     QFile* fileToReceive;          // 正在接收的文件
     qint64 fileTotalSizeToReceive; // 要接收的文件总大小
