@@ -11,6 +11,9 @@ LoginWidget::LoginWidget(QWidget *parent)
 
     connect(c,&client::loginfail,this,&LoginWidget::fail);
     connect(c,&client::loginsucess,this,&LoginWidget::success);
+    connect(c,&client::registerSuccess,this,&LoginWidget::registerSuccess);
+
+    connect(c,&client::registerFail, this,&LoginWidget::registerFail);
 }
 
 void LoginWidget::onLoginClicked() {
@@ -18,7 +21,7 @@ void LoginWidget::onLoginClicked() {
         shakeAnimation();
         QMessageBox::warning(this, "错误", "用户名和密码不能为空");
     } else {
-        user["type"]="login";
+        user["type"] = isRegisterMode ? "register" : "login";
         user["name"]=usernameEdit->text();
         user["pwd"]=passwordEdit->text();
         c->sendJsonMessage(user);
@@ -114,7 +117,7 @@ void LoginWidget::setupUI() {
         );
 
     // 登录按钮
-    QPushButton *loginButton = new QPushButton("登 录");
+    loginButton = new QPushButton("登 录");
     loginButton->setStyleSheet(
         "QPushButton {"
         "   background-color: #ff4081;"
@@ -137,7 +140,7 @@ void LoginWidget::setupUI() {
     bottomLayout->setContentsMargins(0, 10, 0, 0);
     bottomLayout->setSpacing(15);
 
-    QPushButton *registerLink = new QPushButton("注册账号");
+    registerLink = new QPushButton("注册账号");
     QPushButton *forgotLink = new QPushButton("忘记密码?");
 
     QString linkStyle = "QPushButton {"
@@ -168,6 +171,7 @@ void LoginWidget::setupUI() {
 
     // 连接信号槽
     connect(loginButton, &QPushButton::clicked, this, &LoginWidget::onLoginClicked);
+    connect(registerLink, &QPushButton::clicked, this, &LoginWidget::onRegisterSwitch);
 }
 
 void LoginWidget::setupLineEdit(QLineEdit *edit, const QString &placeholder) {
@@ -244,3 +248,47 @@ void LoginWidget::fail(QString m)
     c->startCommunication();
 }
 
+void LoginWidget::onRegisterSwitch()
+{
+    isRegisterMode = !isRegisterMode;
+
+    if(isRegisterMode)
+    {
+        loginButton->setText("注 册");
+        registerLink->setText("返回登录");
+        setWindowTitle("注册");
+    }
+    else
+    {
+        loginButton->setText("登 录");
+        registerLink->setText("注册账号");
+        setWindowTitle("登录");
+    }
+}
+
+void LoginWidget::registerSuccess(uint userid, QString message)
+{
+    QMessageBox::information(
+        this,
+        "注册成功",
+        QString("%1\n您的用户ID：%2,可以进行登录")
+            .arg(message)
+            .arg(userid));
+
+    // 切回登录模式
+    isRegisterMode = false;
+    loginButton->setText("登 录");
+    registerLink->setText("注册账号");
+    setWindowTitle("登录");
+
+    // 可以保留用户名，清空密码
+    passwordEdit->clear();
+}
+
+void LoginWidget::registerFail(QString message)
+{
+    QMessageBox::warning(
+        this,
+        "注册失败",
+        message);
+}

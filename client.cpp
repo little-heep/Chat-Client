@@ -21,6 +21,13 @@ client::client(QObject *parent)
     connect(tcpSocket,&QSslSocket::disconnected,this,[=](){
         qDebug()<<"已断开连接\n";
         isconnected=false;
+        if (waitReconnect)
+        {
+            waitReconnect = false;
+
+            qDebug() << "重新连接服务器...";
+            startCommunication();
+        }
     });
 }
 
@@ -122,6 +129,10 @@ void client::readData() {
             addfriendnotify(jsonData);
         else if (type=="acceptfriend_response")
             acceptfriendresponse(jsonData);
+        else if(type == "register_response")
+        {
+            registercheck(jsonData);
+        }
         else if (type == "another_type") { // 对应于另一种消息类型的type值
             // 解析并处理另一种类型的消息
         }
@@ -550,3 +561,40 @@ void client::receiveFileData()
 }
 
 
+void client::registercheck(const QByteArray &jsonData){
+    QJsonParseError parseError;
+    QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
+
+    if (parseError.error != QJsonParseError::NoError) {
+        qWarning() << "文件通知JSON解析错误:" << parseError.errorString();
+        return;
+    }
+
+    QJsonObject obj = doc.object();
+
+    QString status = obj["status"].toString();
+    QString message = obj["message"].toString();
+
+    if(status == "success")
+    {
+        waitReconnect = true;
+        uint userid = obj["userid"].toInt();
+        emit registerSuccess(userid, message);
+    }
+    else
+    {
+        emit registerFail(message);
+    }
+}
+
+void client::reconnect()
+{
+    qDebug() << "开始重新连接服务器...";
+
+    if (tcpSocket->state() != QAbstractSocket::UnconnectedState)
+    {
+        tcpSocket->abort();
+    }
+
+    startCommunication();
+}

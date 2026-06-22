@@ -56,10 +56,14 @@ signals:
 
 private slots:
     void onLoginClicked();
+    void onRegisterSwitch();
     void success(QString id);
     void fail(QString m);
+    void registerSuccess(uint userid, QString message);
+    void registerFail(QString message);
 
 private:
+    bool isRegisterMode = false;
     QLabel *avatarLabel;
     QLineEdit *usernameEdit;
     QLineEdit *passwordEdit;
@@ -68,7 +72,8 @@ private:
     MyWindow *w;
     client *c;
     QJsonObject user;
-
+    QPushButton *loginButton;
+    QPushButton *registerLink;
 private:
     void setupUI();
     void setupLineEdit(QLineEdit *edit, const QString &placeholder);

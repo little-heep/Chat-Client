@@ -22,6 +22,7 @@ public:
     explicit client(QObject *parent = nullptr);
 
     void startCommunication();
+    void reconnect();
     void sendJsonMessage(const QJsonObject &jsonMsg);//发送json消息
     void sendfile(const QString filename,const QString sendid,const QString receiveid);//发送文件
 
@@ -42,9 +43,13 @@ signals:
     void addfriendresult(bool ok,QString detail);
     void addfriendrequest(FriendInfo finfo);
     void acceptfriend(FriendInfo finfo);
+    void registerSuccess(uint userid, QString message);
+    void registerFail(QString message);
 private:
     QString aimip;
     QString aimport;
+
+    bool waitReconnect = false;
 
     //发送文件相关数据
     QFile *fileToSend;
@@ -57,6 +62,7 @@ private:
     FriendListMessage parseFriendListMessage(const QByteArray& jsonData);
     Message* parsetalkmessage(const QByteArray & jsonData);
     void logincheck(const QByteArray &jsonData);
+    void registercheck(const QByteArray &jsonData);
     void changepwdcheck(const QByteArray & jsonData);
     void changenamecheck(const QByteArray & jsonData);
 
