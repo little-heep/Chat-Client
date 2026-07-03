@@ -76,12 +76,30 @@ private:
     QString sendid;//发送人
     void readfile(const QByteArray &jsonData);//接收文件
 
+    QByteArray recvBuffer;
+    void processMessage(const QByteArray &jsonData);
+
 private slots:
     void handleError(QAbstractSocket::SocketError socketError);
     void readData();
-    void receiveFileData();
 
 
+private:
+
+    // 文件状态
+    bool receivingFile = false;
+
+    // JSON帧解析状态
+    enum ParseState {
+        ReadingHeader,
+        ReadingBody
+    };
+
+    ParseState state = ReadingHeader;
+    quint32 currentType = 0;
+    quint32 currentLength = 0;
+    void handlePacket(quint32 type, const QByteArray &data);
+    void handleFileData(const QByteArray &data);
 
 
 };

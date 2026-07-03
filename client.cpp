@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QTimer>
+#include <QDataStream>
 
 
 client::client(QObject *parent)
@@ -88,59 +89,90 @@ void client::handleError(QAbstractSocket::SocketError socketError) {
 
 //读取数据
 void client::readData() {
-    if (tcpSocket) {
-        // 从socket读取所有可用的数据
-        QByteArray jsonData = tcpSocket->readAll();
+    recvBuffer.append(tcpSocket->readAll());
+    while (true)
+    {
+        // ===== 1. 先读 type + length =====
+        if (state == ReadingHeader)
+        {
+            if (recvBuffer.size() < 8)
+                return;
 
-        QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-        if (!doc.isObject()) {
-            qWarning() << "Received data is not a valid JSON object.";
+            QDataStream stream(&recvBuffer,QIODevice::ReadOnly);
+            stream.setByteOrder(QDataStream::BigEndian);
+
+            stream >> currentType;
+            stream >> currentLength;
+
+            recvBuffer.remove(0, 8);
+            state = ReadingBody;
+        }
+
+        // ===== 2. body不够 =====
+        if (recvBuffer.size() < currentLength)
             return;
-        }
 
-        QJsonObject obj = doc.object();
-        QString type = obj.value("type").toString();
+        QByteArray body = recvBuffer.left(currentLength);
+        recvBuffer.remove(0, currentLength);
 
-        if (type == "friend_list") {
-            friendlist = parseFriendListMessage(jsonData);
-            friendlist.print();
-            qDebug()<<"from client";
-            emit updatefriend(friendlist);
-        }
-        else if(type=="message")
-        {   //接收消息，处理json数据，然后显示
-            message=parsetalkmessage(jsonData);
-            qDebug()<<message->content+"\n"+message->sendTime.toString("yyyy-MM-dd hh:mm")+"\n";
-            emit messageLogged(message->sendid,message->receiveid,message->content,message->sendTime);
-        }
-        else if(type=="login_response")
-        {
-            logincheck(jsonData);
-        }
-        else if(type=="file_notify")
-            readfile(jsonData);
-        else if (type=="changepwd_response")
-            changepwdcheck(jsonData);
-        else if (type=="changename_response")
-            changenamecheck(jsonData);
-        else if(type=="addfriend_response")
-            addfriendcheck(jsonData);
-        else if(type=="addfriend_request")
-            addfriendnotify(jsonData);
-        else if (type=="acceptfriend_response")
-            acceptfriendresponse(jsonData);
-        else if(type == "register_response")
-        {
-            registercheck(jsonData);
-        }
-        else if (type == "another_type") { // 对应于另一种消息类型的type值
-            // 解析并处理另一种类型的消息
-        }
-        else {
-            qDebug() << "Unknown message type:" << type;
-        }
+        state = ReadingHeader;
+
+        // ===== 3. 分发 =====
+        handlePacket(currentType, body);
     }
 }
+
+
+void client::processMessage(const QByteArray &jsonData){
+    QJsonDocument doc = QJsonDocument::fromJson(jsonData);
+    if (!doc.isObject()) {
+        qWarning() << "Received data is not a valid JSON object.";
+        return;
+    }
+
+    QJsonObject obj = doc.object();
+    QString type = obj.value("type").toString();
+
+    if (type == "friend_list") {
+        friendlist = parseFriendListMessage(jsonData);
+        friendlist.print();
+        qDebug()<<"from client";
+        emit updatefriend(friendlist);
+    }
+    else if(type=="message")
+    {   //接收消息，处理json数据，然后显示
+        message=parsetalkmessage(jsonData);
+        qDebug()<<message->content+"\n"+message->sendTime.toString("yyyy-MM-dd hh:mm")+"\n";
+        emit messageLogged(message->sendid,message->receiveid,message->content,message->sendTime);
+    }
+    else if(type=="login_response")
+    {
+        logincheck(jsonData);
+    }
+    else if(type=="file_notify")
+        readfile(jsonData);
+    else if (type=="changepwd_response")
+        changepwdcheck(jsonData);
+    else if (type=="changename_response")
+        changenamecheck(jsonData);
+    else if(type=="addfriend_response")
+        addfriendcheck(jsonData);
+    else if(type=="addfriend_request")
+        addfriendnotify(jsonData);
+    else if (type=="acceptfriend_response")
+        acceptfriendresponse(jsonData);
+    else if(type == "register_response")
+    {
+        registercheck(jsonData);
+    }
+    else if (type == "another_type") { // 对应于另一种消息类型的type值
+        // 解析并处理另一种类型的消息
+    }
+    else {
+        qDebug() << "Unknown message type:" << type;
+    }
+}
+
 
 void client::acceptfriendresponse(const QByteArray & jsonData)
 {
@@ -335,22 +367,21 @@ Message* client::parsetalkmessage(const QByteArray & jsonData)
 
 //发送json数据
 void client::sendJsonMessage(const QJsonObject &jsonMsg) {
-    // 将JSON对象转换为文档
     QJsonDocument doc(jsonMsg);
-    // 转换为 QByteArray
     QByteArray jsonData = doc.toJson(QJsonDocument::Compact);
 
-    if (tcpSocket->state() == QAbstractSocket::ConnectedState) {
-        // 发送数据长度（作为quint32），然后是数据本身
-        // 先保存 size 到一个局部变量
-        quint32 size = static_cast<quint32>(jsonData.size());
-        // 再发送 size
-        tcpSocket->write(reinterpret_cast<const char*>(&size), sizeof(quint32));
-        tcpSocket->write(jsonData);
-        tcpSocket->flush(); // 立即发送缓冲的数据
-    } else {
-        qDebug() << "Socket is not connected. Cannot send message.";
-    }
+    quint32 type = 1;
+    quint32 len = jsonData.size();
+
+    QByteArray block;
+    QDataStream stream(&block, QIODevice::WriteOnly);
+    stream.setByteOrder(QDataStream::BigEndian);
+
+    stream << type;
+    stream << len;
+    block.append(jsonData);
+
+    tcpSocket->write(block);
 }
 
 void client::logincheck(const QByteArray &jsonData)
@@ -410,56 +441,70 @@ void client::sendfile(const QString filename,const QString sendid,const QString 
 // 发送文件头信息
 void client::sendFileHeader(const QString &fileName, qint64 fileSize,QString sendid,QString receiveid)
 {
-    // 构造文件头消息
     QJsonObject header;
-    header["type"] = "file_transfer";
     header["filename"] = fileName;
-    header["size"] = QString::number(fileSize); // 使用字符串避免JS数字精度问题
-    header["sendid"]=sendid;
-    header["receiveid"]=receiveid;
+    header["size"] = fileSize;
+    header["sendid"] = sendid;
+    header["receiveid"] = receiveid;
 
-    // 发送文件头
-    sendJsonMessage(header);
+    QJsonDocument doc(header);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
 
-    // 开始发送文件数据
-    QTimer::singleShot(0, this, &client::sendFileData);
+    quint32 type = 3; // file header
+    quint32 len = data.size();
+
+    QByteArray block;
+    QDataStream stream(&block, QIODevice::WriteOnly);
+    stream.setByteOrder(QDataStream::BigEndian);
+
+    stream << type << len;
+    block.append(data);
+
+    tcpSocket->write(block);
+
+    QTimer::singleShot(0,this,&client::sendFileData);
 }
 
 // 发送文件数据
 void client::sendFileData()
 {
-    if (!fileToSend || !fileToSend->isOpen()) {
+    if (!fileToSend || !fileToSend->isOpen())
         return;
-    }
 
-    // 每次发送1MB数据块
-    const qint64 chunkSize = 1024 * 1024;
+    const qint64 chunkSize = 64 * 1024;
+
     QByteArray chunk = fileToSend->read(chunkSize);
-    qint64 bytesWritten = tcpSocket->write(chunk);
-
-    if (bytesWritten == -1) {
-        qDebug() << "文件发送错误:" << tcpSocket->errorString();
+    if (chunk.isEmpty())
+    {
+        qDebug()<<"文件发送完成";
         fileToSend->close();
         delete fileToSend;
         fileToSend = nullptr;
         return;
     }
 
-    fileBytesSent += bytesWritten;
+    quint32 type = 2; // file chunk
+    quint32 len = chunk.size();
 
-    if (fileBytesSent < fileTotalSize) {
-        // 继续发送下一块数据
-        QTimer::singleShot(0, this, &client::sendFileData);
-    } else {
-        // 文件发送完成
-        qDebug() << "文件发送完成:" << fileToSend->fileName();
-        fileToSend->close();
-        delete fileToSend;
-        fileToSend = nullptr;
-        qDebug()<<"文件发送完成";
+    QByteArray block;
+    QDataStream stream(&block, QIODevice::WriteOnly);
+    stream.setByteOrder(QDataStream::BigEndian);
+
+    stream << type << len;
+    block.append(chunk);
+
+    qint64 ret =tcpSocket->write(block);
+    tcpSocket->flush();
+
+    if(ret==-1)
+    {
+        qDebug()<<"发送失败";
     }
+
+    QTimer::singleShot(0, this, &client::sendFileData);
 }
 
+//读取文件消息
 void client::readfile(const QByteArray &jsonData)
 {
     QJsonParseError parseError;
@@ -474,8 +519,8 @@ void client::readfile(const QByteArray &jsonData)
 
     // 解析文件信息
     QString fileName = obj["filename"].toString();
-    qint64 fileSize = obj["size"].toString().toLongLong(); // 因为之前用字符串传输
-    sendid = obj["sender_id"].toString();
+    qint64 fileSize = obj["size"].toVariant().toLongLong();
+    sendid = obj["sendid"].toString();
     qDebug()<<"client解析文件头时的sendid："<<sendid;
 
     // 设置保存路径
@@ -508,56 +553,6 @@ void client::readfile(const QByteArray &jsonData)
 
     fileTotalSizeToReceive = fileSize;
     fileBytesReceived = 0;
-    disconnect(tcpSocket, &QSslSocket::readyRead, this,&client::readData);
-    connect(tcpSocket, &QSslSocket::readyRead, this, &client::receiveFileData);
-
-}
-
-// 新增的二进制数据接收函数
-void client::receiveFileData()
-{
-    if (!fileToReceive || !fileToReceive->isOpen()) {
-        return;
-    }
-
-    // 读取所有可用数据（二进制）
-    QByteArray data = tcpSocket->readAll();
-    qint64 bytesWritten = fileToReceive->write(data);
-
-    if (bytesWritten == -1) {
-        qWarning() << "文件写入错误:" << fileToReceive->errorString();
-        fileToReceive->close();
-        delete fileToReceive;
-        fileToReceive = nullptr;
-        disconnect(tcpSocket, &QSslSocket::readyRead, this, &client::receiveFileData);
-        connect(tcpSocket, &QSslSocket::readyRead, this,&client::readData);
-        return;
-    }
-
-    fileBytesReceived += bytesWritten;
-
-    // 检查文件是否接收完成
-    if (fileBytesReceived >= fileTotalSizeToReceive) {
-        fileToReceive->close();
-        qDebug() << "文件接收完成:" << fileToReceive->fileName();
-
-        // 发送接收完成通知
-        QJsonObject complete;
-        complete["type"] = "file_complete";
-        complete["filename"] = QFileInfo(fileToReceive->fileName()).fileName();
-        sendJsonMessage(complete);
-
-        // 清理资源
-        disconnect(tcpSocket, &QSslSocket::readyRead, this, &client::receiveFileData);
-        connect(tcpSocket, &QSslSocket::readyRead, this,&client::readData);
-        QString filePath = fileToReceive->fileName();
-        delete fileToReceive;
-        fileToReceive = nullptr;
-
-        // 通知UI文件已接收
-        emit fileReceived(sendid,filePath);
-        qDebug()<<"client发送信号时的sendid："<<sendid;
-    }
 }
 
 
@@ -597,4 +592,48 @@ void client::reconnect()
     }
 
     startCommunication();
+}
+
+
+void client::handleFileData(const QByteArray &data)
+{
+    if (!fileToReceive)
+        return;
+
+    fileToReceive->write(data);
+    fileBytesReceived += data.size();
+
+    if (fileBytesReceived >= fileTotalSizeToReceive)
+    {
+        fileToReceive->close();
+
+        emit fileReceived(sendid, fileToReceive->fileName());
+
+        delete fileToReceive;
+        fileToReceive = nullptr;
+
+        qDebug() << "文件接收完成";
+    }
+}
+
+void client::handlePacket(quint32 type, const QByteArray &data)
+{
+    switch (type)
+    {
+    case 1: // JSON
+        processMessage(data);
+        break;
+
+    case 2: // 文件数据
+        handleFileData(data);
+        break;
+
+    case 3: // 文件头（可选）
+        readfile(data);
+        break;
+
+    default:
+        qDebug() << "unknown type:" << type;
+        break;
+    }
 }
