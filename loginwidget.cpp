@@ -2,8 +2,16 @@
 LoginWidget::LoginWidget(QWidget *parent)
     : QWidget{parent}
 {
+    networkThread = new QThread;
     c=new client;
-    c->startCommunication();
+    c->moveToThread(networkThread);
+
+    connect(networkThread,
+            &QThread::started,
+            c,
+            &client::init);
+
+    networkThread->start();
     setupUI();
     setupAnimations();
     setupEffects();
@@ -14,6 +22,10 @@ LoginWidget::LoginWidget(QWidget *parent)
     connect(c,&client::registerSuccess,this,&LoginWidget::registerSuccess);
 
     connect(c,&client::registerFail, this,&LoginWidget::registerFail);
+
+    connect(this,&LoginWidget::senduser,c,&client::onsendmessage);
+    connect(this,&LoginWidget::restart,c,&client::onrestart);
+
 }
 
 void LoginWidget::onLoginClicked() {
@@ -24,7 +36,8 @@ void LoginWidget::onLoginClicked() {
         user["type"] = isRegisterMode ? "register" : "login";
         user["name"]=usernameEdit->text();
         user["pwd"]=passwordEdit->text();
-        c->sendJsonMessage(user);
+        emit senduser(user);
+       // c->sendJsonMessage(user);
     }
 }
 
@@ -238,14 +251,17 @@ void LoginWidget::mouseMoveEvent(QMouseEvent *event){
 
 void LoginWidget::success(QString id)
 {
-    w=new MyWindow(id,usernameEdit->text(),c);
-    this->close();
+    w=new MyWindow(id,usernameEdit->text(),c,networkThread);
+
     w->show();
+    this->deleteLater();
 }
 void LoginWidget::fail(QString m)
 {
     QMessageBox::critical(this,"登录错误",m);
-    c->startCommunication();
+
+    emit restart();
+   // c->startCommunication();
 }
 
 void LoginWidget::onRegisterSwitch()

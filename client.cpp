@@ -8,9 +8,13 @@
 client::client(QObject *parent)
     : QObject{parent}
 {
+
+}
+void client::init()
+{
     tcpSocket=new QSslSocket(this);
     //QHostAddress localhost = QHostAddress::LocalHost;
-    aimip="127.0.0.1";
+    aimip="120.76.136.246";
     aimport="12345";
 
     connect(tcpSocket, &QSslSocket::connected, this, [=]() {
@@ -30,6 +34,8 @@ client::client(QObject *parent)
             startCommunication();
         }
     });
+
+    startCommunication();   // 开始连接服务器
 }
 
 //开始连接
@@ -636,4 +642,13 @@ void client::handlePacket(quint32 type, const QByteArray &data)
         qDebug() << "unknown type:" << type;
         break;
     }
+}
+
+
+void client::onrestart(){
+    startCommunication();
+}
+
+void client::onsendmessage(QJsonObject user){
+    sendJsonMessage(user);
 }

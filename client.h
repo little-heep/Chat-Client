@@ -45,6 +45,12 @@ signals:
     void acceptfriend(FriendInfo finfo);
     void registerSuccess(uint userid, QString message);
     void registerFail(QString message);
+public slots:
+    void init();
+
+    void onrestart();
+    void onsendmessage(QJsonObject message);
+
 private:
     QString aimip;
     QString aimport;
@@ -82,7 +88,6 @@ private:
 private slots:
     void handleError(QAbstractSocket::SocketError socketError);
     void readData();
-
 
 private:
 

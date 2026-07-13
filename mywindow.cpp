@@ -2,13 +2,13 @@
 
 #include <QDebug>
 
-MyWindow::MyWindow(QString id,QString name,client *c,QWidget *parent)
+MyWindow::MyWindow(QString id,QString name,client *c,QThread *thread,QWidget *parent)
     : QMainWindow(parent)
 {
     m_id=id;
     m_name=name;
     clen = c;
-
+    m_thread=thread;
     db = new DBManage;
 
     db->initDatabase();
@@ -97,6 +97,12 @@ MyWindow::~MyWindow() {
         delete db;
         db = nullptr;
     }
+    m_thread->quit();
+    m_thread->wait();
+
+    clen->deleteLater();
+
+    m_thread->deleteLater();
 }
 
 QWidget* MyWindow::createFriendPage()

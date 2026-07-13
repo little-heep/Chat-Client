@@ -11,6 +11,7 @@
 #include <QStackedWidget>
 #include <QFont>
 #include <QFontDatabase>
+#include <QThread>
 #include "chatwidget.h"
 #include "client.h"
 #include "dbmanage.h"
@@ -23,13 +24,14 @@ class MyWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MyWindow(QString id,QString name,client *c,QWidget *parent = nullptr);
+    MyWindow(QString id,QString name,client *c,QThread *thread,QWidget *parent = nullptr);
     ~MyWindow();
 
 private:
 
     //创建客户端连接
     client *clen;
+    QThread *m_thread;
 
     //数据库管理
     DBManage *db;

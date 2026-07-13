@@ -18,6 +18,7 @@
 #include <QStyle>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QThread>
 #include "mywindow.h"
 #include "client.h"
 
@@ -54,6 +55,10 @@ public:
 
 signals:
 
+    //发送给client的信号
+    void senduser(QJsonObject user);
+    void restart();
+
 private slots:
     void onLoginClicked();
     void onRegisterSwitch();
@@ -61,6 +66,7 @@ private slots:
     void fail(QString m);
     void registerSuccess(uint userid, QString message);
     void registerFail(QString message);
+
 
 private:
     bool isRegisterMode = false;
@@ -74,6 +80,7 @@ private:
     QJsonObject user;
     QPushButton *loginButton;
     QPushButton *registerLink;
+    QThread *networkThread;
 private:
     void setupUI();
     void setupLineEdit(QLineEdit *edit, const QString &placeholder);

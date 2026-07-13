@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_client_t {
-    QByteArrayData data[33];
-    char stringdata0[356];
+    QByteArrayData data[36];
+    char stringdata0[385];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -61,10 +61,13 @@ QT_MOC_LITERAL(25, 245, 12), // "acceptfriend"
 QT_MOC_LITERAL(26, 258, 15), // "registerSuccess"
 QT_MOC_LITERAL(27, 274, 6), // "userid"
 QT_MOC_LITERAL(28, 281, 12), // "registerFail"
-QT_MOC_LITERAL(29, 294, 11), // "handleError"
-QT_MOC_LITERAL(30, 306, 28), // "QAbstractSocket::SocketError"
-QT_MOC_LITERAL(31, 335, 11), // "socketError"
-QT_MOC_LITERAL(32, 347, 8) // "readData"
+QT_MOC_LITERAL(29, 294, 4), // "init"
+QT_MOC_LITERAL(30, 299, 9), // "onrestart"
+QT_MOC_LITERAL(31, 309, 13), // "onsendmessage"
+QT_MOC_LITERAL(32, 323, 11), // "handleError"
+QT_MOC_LITERAL(33, 335, 28), // "QAbstractSocket::SocketError"
+QT_MOC_LITERAL(34, 364, 11), // "socketError"
+QT_MOC_LITERAL(35, 376, 8) // "readData"
 
     },
     "client\0messageLogged\0\0sendid\0receiveid\0"
@@ -75,8 +78,9 @@ QT_MOC_LITERAL(32, 347, 8) // "readData"
     "addfriendresult\0ok\0detail\0addfriendrequest\0"
     "FriendInfo\0finfo\0acceptfriend\0"
     "registerSuccess\0userid\0registerFail\0"
-    "handleError\0QAbstractSocket::SocketError\0"
-    "socketError\0readData"
+    "init\0onrestart\0onsendmessage\0handleError\0"
+    "QAbstractSocket::SocketError\0socketError\0"
+    "readData"
 };
 #undef QT_MOC_LITERAL
 
@@ -86,7 +90,7 @@ static const uint qt_meta_data_client[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      14,   14, // methods
+      17,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -94,22 +98,25 @@ static const uint qt_meta_data_client[] = {
       12,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    4,   84,    2, 0x06 /* Public */,
-       7,    1,   93,    2, 0x06 /* Public */,
-      10,    1,   96,    2, 0x06 /* Public */,
-      12,    1,   99,    2, 0x06 /* Public */,
-      13,    2,  102,    2, 0x06 /* Public */,
-      15,    2,  107,    2, 0x06 /* Public */,
-      18,    1,  112,    2, 0x06 /* Public */,
-      19,    2,  115,    2, 0x06 /* Public */,
-      22,    1,  120,    2, 0x06 /* Public */,
-      25,    1,  123,    2, 0x06 /* Public */,
-      26,    2,  126,    2, 0x06 /* Public */,
-      28,    1,  131,    2, 0x06 /* Public */,
+       1,    4,   99,    2, 0x06 /* Public */,
+       7,    1,  108,    2, 0x06 /* Public */,
+      10,    1,  111,    2, 0x06 /* Public */,
+      12,    1,  114,    2, 0x06 /* Public */,
+      13,    2,  117,    2, 0x06 /* Public */,
+      15,    2,  122,    2, 0x06 /* Public */,
+      18,    1,  127,    2, 0x06 /* Public */,
+      19,    2,  130,    2, 0x06 /* Public */,
+      22,    1,  135,    2, 0x06 /* Public */,
+      25,    1,  138,    2, 0x06 /* Public */,
+      26,    2,  141,    2, 0x06 /* Public */,
+      28,    1,  146,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-      29,    1,  134,    2, 0x08 /* Private */,
-      32,    0,  137,    2, 0x08 /* Private */,
+      29,    0,  149,    2, 0x0a /* Public */,
+      30,    0,  150,    2, 0x0a /* Public */,
+      31,    1,  151,    2, 0x0a /* Public */,
+      32,    1,  154,    2, 0x08 /* Private */,
+      35,    0,  157,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::QDateTime,    3,    4,    5,    6,
@@ -126,7 +133,10 @@ static const uint qt_meta_data_client[] = {
     QMetaType::Void, QMetaType::QString,    9,
 
  // slots: parameters
-    QMetaType::Void, 0x80000000 | 30,   31,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::QJsonObject,    9,
+    QMetaType::Void, 0x80000000 | 33,   34,
     QMetaType::Void,
 
        0        // eod
@@ -150,14 +160,17 @@ void client::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
         case 9: _t->acceptfriend((*reinterpret_cast< FriendInfo(*)>(_a[1]))); break;
         case 10: _t->registerSuccess((*reinterpret_cast< uint(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
         case 11: _t->registerFail((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 12: _t->handleError((*reinterpret_cast< QAbstractSocket::SocketError(*)>(_a[1]))); break;
-        case 13: _t->readData(); break;
+        case 12: _t->init(); break;
+        case 13: _t->onrestart(); break;
+        case 14: _t->onsendmessage((*reinterpret_cast< QJsonObject(*)>(_a[1]))); break;
+        case 15: _t->handleError((*reinterpret_cast< QAbstractSocket::SocketError(*)>(_a[1]))); break;
+        case 16: _t->readData(); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
         switch (_id) {
         default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-        case 12:
+        case 15:
             switch (*reinterpret_cast<int*>(_a[1])) {
             default: *reinterpret_cast<int*>(_a[0]) = -1; break;
             case 0:
@@ -283,13 +296,13 @@ int client::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 14)
+        if (_id < 17)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 14;
+        _id -= 17;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 14)
+        if (_id < 17)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 14;
+        _id -= 17;
     }
     return _id;
 }
