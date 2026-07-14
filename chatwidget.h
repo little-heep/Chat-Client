@@ -21,13 +21,13 @@ class ChatWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ChatWidget(QWidget *parent = nullptr,client *clen=0);
+    explicit ChatWidget(QWidget *parent = nullptr);
 
     void setmyid(QString i);//设置我自己的id
     void setcurrentid(QString  id);//设置好友的id
     void loadinglog(Message &msg);//加载聊天记录
 private:
-    client * clen;
+
     QLabel *iplab;
     QLineEdit *iple;
     QPushButton *send,*start,*sendfile;
@@ -56,8 +56,11 @@ public slots:
 private slots:
     void onsendfile();
 
+
 signals:
     void addchatlog(const Message &msg);//添加聊天记录的信号
+    void sendmessage(const QJsonObject &jsonMsg);
+    void sendfilemsg(const QString filename,const QString sendid,const QString receiveid);
 };
 
 #endif // CHATWIDGET_H

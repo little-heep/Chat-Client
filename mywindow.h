@@ -78,7 +78,7 @@ private slots:
     void onacceptfriend(FriendInfo);
 
 signals:
-
+    void sendjson(QJsonObject json);
 
 protected:
     //void showEvent(QShowEvent *event);

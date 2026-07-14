@@ -12,6 +12,8 @@ MyWindow::MyWindow(QString id,QString name,client *c,QThread *thread,QWidget *pa
     db = new DBManage;
 
     db->initDatabase();
+
+    connect(this,&MyWindow::sendjson,clen,&client::onsendmessage);
     // 主窗口设置
     setWindowTitle("客户端");
     resize(800, 600);
@@ -40,11 +42,14 @@ MyWindow::MyWindow(QString id,QString name,client *c,QThread *thread,QWidget *pa
     // 为每个菜单项创建对应的内容页面
     for (int i = 0; i < menuItems.size(); ++i) {
         if(i==0){
-            msgwidget=new MessageWidget(m_id,clen,stackedWidget);
+            msgwidget=new MessageWidget(m_id,stackedWidget);
             stackedWidget->addWidget(msgwidget);
             connect(msgwidget,SIGNAL(addfriendbyid(QString)),this,SLOT(onaddfriendbyid(QString)));
             connect(msgwidget,SIGNAL(addfriendbyname(QString)),this,SLOT(onaddfriendbyname(QString)));
-
+            connect(msgwidget,SIGNAL(sendfilemsg(QString,QString,QString)),clen,SLOT(onsendfile(QString,QString,QString)));
+            connect(msgwidget,&MessageWidget::sendmessage,clen,&client::onsendmessage);
+            connect(clen, &client::messageLogged, msgwidget, &MessageWidget::onappendLog);
+            connect(clen,SIGNAL(fileReceived(QString,QString)),msgwidget,SLOT(onfileReceived(QString,QString)));
         }
         else if(i==1)
         {
@@ -100,9 +105,7 @@ MyWindow::~MyWindow() {
     m_thread->quit();
     m_thread->wait();
 
-    clen->deleteLater();
-
-    m_thread->deleteLater();
+    delete m_thread;
 }
 
 QWidget* MyWindow::createFriendPage()
@@ -244,7 +247,8 @@ void MyWindow::onchangepwd(QString oldpwd,QString newpwd)//修改密码
     json["newpwd"] = newpwd;
 
     //发送消息
-    clen->sendJsonMessage(json);
+    emit sendjson(json);
+    //clen->sendJsonMessage(json);
 
 }
 void MyWindow::onchangename(QString newname)//修改昵称
@@ -255,7 +259,8 @@ void MyWindow::onchangename(QString newname)//修改昵称
     json["name"] = newname;
 
     //发送消息
-    clen->sendJsonMessage(json);
+    emit sendjson(json);
+    //clen->sendJsonMessage(json);
 }
 
 void MyWindow::onaddfriendbyid(QString id)
@@ -267,7 +272,8 @@ void MyWindow::onaddfriendbyid(QString id)
     json["addid"]=id;
 
     //发送消息
-    clen->sendJsonMessage(json);
+    //clen->sendJsonMessage(json);
+    emit sendjson(json);
 }
 
 void MyWindow::onaddfriendbyname(QString name)
@@ -279,7 +285,8 @@ void MyWindow::onaddfriendbyname(QString name)
     json["addid"]="";
 
     //发送消息
-    clen->sendJsonMessage(json);
+    //clen->sendJsonMessage(json);
+    emit sendjson(json);
 }
 
 void MyWindow::onaddfriendresult(bool ok,QString detail)
@@ -304,7 +311,8 @@ void MyWindow::onaddfriendrequest(FriendInfo friendinfo)
         json["type"] = "acceptfriend";        // 消息类型标识
         json["addname"]=friendinfo.name;
         //发送消息
-        clen->sendJsonMessage(json);
+        emit sendjson(json);
+        //clen->sendJsonMessage(json);
     }
 
 }

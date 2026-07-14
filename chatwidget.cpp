@@ -3,10 +3,9 @@
 #include <QFileDialog>
 #include "filelinemessage.h"
 
-ChatWidget::ChatWidget(QWidget *parent ,client *c)
+ChatWidget::ChatWidget(QWidget *parent)
     : QWidget{parent}
 {
-    clen=c;
 
     sp=new QSplitter(Qt::Vertical,this);
     send = new QPushButton("发送");
@@ -43,9 +42,9 @@ ChatWidget::ChatWidget(QWidget *parent ,client *c)
     dealfile=new fileHandle();
 
     connect(send,SIGNAL(clicked()),this,SLOT(sendFun()));
-    connect(clen, &client::messageLogged, this, &ChatWidget::appendLog);
+   // connect(clen, &client::messageLogged, this, &ChatWidget::appendLog);
     connect(sendfile,SIGNAL(clicked()),this,SLOT(onsendfile()));
-    connect(clen,SIGNAL(fileReceived(QString,QString)),this,SLOT(onfileReceived(QString,QString)));
+   // connect(clen,SIGNAL(fileReceived(QString,QString)),this,SLOT(onfileReceived(QString,QString)));
 
     setstyle();
 
@@ -94,7 +93,7 @@ void ChatWidget::onsendfile()
     m_fileName=QFileDialog::getOpenFileName(this);
     if(!m_fileName.isEmpty()){
         //调用clen的发送文件函数
-        clen->sendfile(m_fileName,id,currentfriendid);
+        emit sendfilemsg(m_fileName,id,currentfriendid);
         //构造文件消息
         FileLineMessage *fl=new FileLineMessage(m_fileName,":/new/prefix1/images/head.png",true,this);
         msglayout->addWidget(fl);
@@ -151,12 +150,9 @@ void ChatWidget::sendFun()
 
     ed->clear();
     appendLog(msg.sendid,msg.receiveid,msg.content,msg.sendTime);
-    if (!clen->isconnected) {
-        qDebug()<<message+"\n连接已断开，发送失败\n";
-        return;
-    }
     //发送消息
-    clen->sendJsonMessage(dealfile->messageToJson(msg));
+    emit sendmessage(dealfile->messageToJson(msg));
+    //clen->sendJsonMessage(dealfile->messageToJson(msg));
     //记录聊天记录
     emit addchatlog(msg);
 

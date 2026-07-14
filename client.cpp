@@ -3,15 +3,32 @@
 #include <QFileInfo>
 #include <QTimer>
 #include <QDataStream>
+#include <QThread>
 
 
 client::client(QObject *parent)
-    : QObject{parent}
+    : QObject(parent),
+    files(new fileHandle),
+    message(nullptr),
+    fileToSend(nullptr),
+    fileToReceive(nullptr),
+    isconnected(false),
+    fileBytesSent(0),
+    fileTotalSize(0),
+    fileBytesReceived(0)
 {
 
 }
+client::~client() {
+    qDebug() << "~client"
+             << this
+             << QThread::currentThread();
+}
 void client::init()
 {
+    qDebug()<<"init";
+
+    Q_ASSERT(tcpSocket == nullptr);
     tcpSocket=new QSslSocket(this);
     //QHostAddress localhost = QHostAddress::LocalHost;
     aimip="120.76.136.246";
@@ -36,6 +53,9 @@ void client::init()
     });
 
     startCommunication();   // 开始连接服务器
+    qDebug()
+        << "client thread:"
+        << QThread::currentThread();
 }
 
 //开始连接
@@ -95,6 +115,9 @@ void client::handleError(QAbstractSocket::SocketError socketError) {
 
 //读取数据
 void client::readData() {
+    qDebug()
+    << "client thread:"
+    << QThread::currentThread();
     recvBuffer.append(tcpSocket->readAll());
     while (true)
     {
@@ -392,6 +415,7 @@ void client::sendJsonMessage(const QJsonObject &jsonMsg) {
 
 void client::logincheck(const QByteArray &jsonData)
 {
+    qDebug() << "logincheck thread:" << QThread::currentThread();
     QJsonParseError parseError;
     QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
 
@@ -650,5 +674,12 @@ void client::onrestart(){
 }
 
 void client::onsendmessage(QJsonObject user){
+    qDebug()
+    << "client thread:"
+    << QThread::currentThread();
     sendJsonMessage(user);
+}
+
+void client::onsendfile(const QString filename,const QString sendid,const QString receiveid){
+    sendfile(filename,sendid,receiveid);
 }

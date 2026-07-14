@@ -20,6 +20,7 @@ class client : public QObject
 public:
 
     explicit client(QObject *parent = nullptr);
+    ~client();
 
     void startCommunication();
     void reconnect();
@@ -27,7 +28,7 @@ public:
     void sendfile(const QString filename,const QString sendid,const QString receiveid);//发送文件
 
     QList<Message*> msglist;
-    QSslSocket *tcpSocket;
+    QSslSocket *tcpSocket= nullptr;;
     fileHandle *files;
     FriendListMessage friendlist;//好友列表
     Message *message;//收到的消息
@@ -50,6 +51,7 @@ public slots:
 
     void onrestart();
     void onsendmessage(QJsonObject message);
+    void onsendfile(const QString filename,const QString sendid,const QString receiveid);
 
 private:
     QString aimip;

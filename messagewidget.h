@@ -10,7 +10,6 @@
 #include <QStackedWidget>
 #include "chatwidget.h"
 #include "allstructs.h"
-#include "client.h"
 #include "friendlistitem.h"
 #include "dbmanage.h"
 #include <QMenu>
@@ -22,11 +21,14 @@ class MessageWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MessageWidget(QString me,client *c,QWidget *parent = nullptr);
+    explicit MessageWidget(QString me,QWidget *parent = nullptr);
 
     //初始化好友列表
     void initfriend(FriendListMessage);
     void addfriend(FriendInfo);
+public slots:
+    void onappendLog(QString sendid,QString receiveid,QString content,QDateTime sendtime);
+    void onfileReceived(const QString sendid,const QString filepath);
 
 private:
     QString myid;
@@ -35,7 +37,6 @@ private:
     QStackedWidget *chatStack;
     QMap<QString,ChatWidget*>chatWidgets;
     QLabel *chatTitle;
-    client *clen;
     DBManage *database=new DBManage();
     QMap<QString,QString> *friendlist;//好友昵称列表
 
@@ -53,11 +54,17 @@ signals:
     void sendid(QString);
     void addfriendbyid(QString);
     void addfriendbyname(QString);
+    void sendmessage(const QJsonObject &jsonMsg);
+    void sendfilemsg(const QString filename,const QString sendid,const QString receiveid);
+    void newmsg(QString sendid,QString receiveid,QString content,QDateTime sendtime);
+    void filereceived(const QString sendid,const QString filepath);
 
 private slots:
     void onSessionChanged(QListWidgetItem *current);
     void onaddlog(const Message &msg);
     void onSearchFriend();
+    void onsendmessage(const QJsonObject &jsonMsg);
+    void onsendfile(const QString filename,const QString sendid,const QString receiveid);
 };
 
 #endif // MESSAGEWIDGET_H

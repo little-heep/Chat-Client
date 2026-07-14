@@ -1,9 +1,8 @@
 #include "messagewidget.h"
 
-MessageWidget::MessageWidget(QString me,client *c,QWidget *parent)
+MessageWidget::MessageWidget(QString me,QWidget *parent)
     : QWidget{parent}
 {
-    clen=c;
     myid=me;
     friendlist = new QMap<QString, QString>();
 
@@ -98,13 +97,17 @@ void MessageWidget::addfriend(FriendInfo finfo)
     sessionList->addItem(item);
 
     // 创建对应的聊天窗口
-    ChatWidget *chat = new ChatWidget(this, clen);
+    ChatWidget *chat = new ChatWidget(this);
     chat->setmyid(myid);
     chat->setcurrentid(finfo.userID);
     chatWidgets.insert(finfo.userID, chat);
     chatStack->addWidget(chat);
     friendlist->insert(finfo.name,finfo.userID);
     connect(chat,&ChatWidget::addchatlog,this,&MessageWidget::onaddlog);
+    connect(chat,&ChatWidget::sendmessage,this,&MessageWidget::onsendmessage);
+    connect(chat,&ChatWidget::sendfilemsg,this,&MessageWidget::onsendfile);
+    connect(this,&MessageWidget::newmsg,chat,&ChatWidget::appendLog);
+    connect(this,&MessageWidget::filereceived,chat,&ChatWidget::onfileReceived);
 }
 
 // 根据好友ID查找并选中列表项
@@ -195,13 +198,17 @@ void MessageWidget::initfriend(FriendListMessage f)
         sessionList->addItem(item);
 
         // 创建对应的聊天窗口
-        ChatWidget *chat = new ChatWidget(this, clen);
+        ChatWidget *chat = new ChatWidget(this);
         chat->setmyid(myid);
         chat->setcurrentid(friendInfo.userID);
         chatWidgets.insert(friendInfo.userID, chat);
         chatStack->addWidget(chat);
         friendlist->insert(friendInfo.name,friendInfo.userID);
         connect(chat,&ChatWidget::addchatlog,this,&MessageWidget::onaddlog);
+        connect(chat,&ChatWidget::sendmessage,this,&MessageWidget::onsendmessage);
+        connect(chat,&ChatWidget::sendfilemsg,this,&MessageWidget::onsendfile);
+        connect(this,&MessageWidget::newmsg,chat,&ChatWidget::appendLog);
+        connect(this,&MessageWidget::filereceived,chat,&ChatWidget::onfileReceived);
     }
 
     //加载聊天记录
@@ -265,4 +272,17 @@ void MessageWidget::showFriendContextMenu(const QPoint &pos) {
 void MessageWidget::onaddlog(const Message &msg)
 {
     database->insertMessage(msg);
+}
+
+void MessageWidget::onsendmessage(const QJsonObject &jsonMsg){
+    emit sendmessage(jsonMsg);
+}
+void MessageWidget::onsendfile(const QString filename,const QString sendid,const QString receiveid){
+    emit sendfilemsg(filename,sendid,receiveid);
+}
+void MessageWidget::onappendLog(QString sendid,QString receiveid,QString content,QDateTime sendtime){
+    emit newmsg(sendid,receiveid,content,sendtime);
+}
+void MessageWidget::onfileReceived(const QString sendid,const QString filepath){
+    emit filereceived(sendid,filepath);
 }

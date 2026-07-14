@@ -1,4 +1,5 @@
 #include "loginwidget.h"
+#include <QTimer>
 LoginWidget::LoginWidget(QWidget *parent)
     : QWidget{parent}
 {
@@ -10,6 +11,10 @@ LoginWidget::LoginWidget(QWidget *parent)
             &QThread::started,
             c,
             &client::init);
+    connect(networkThread,
+            &QThread::finished,
+            c,
+            &QObject::deleteLater);
 
     networkThread->start();
     setupUI();
@@ -26,6 +31,10 @@ LoginWidget::LoginWidget(QWidget *parent)
     connect(this,&LoginWidget::senduser,c,&client::onsendmessage);
     connect(this,&LoginWidget::restart,c,&client::onrestart);
 
+}
+
+LoginWidget::~LoginWidget() {
+    qDebug() << "~LoginWidget begin";
 }
 
 void LoginWidget::onLoginClicked() {
@@ -254,6 +263,7 @@ void LoginWidget::success(QString id)
     w=new MyWindow(id,usernameEdit->text(),c,networkThread);
 
     w->show();
+    //QTimer::singleShot(1000, this, &QObject::deleteLater);
     this->deleteLater();
 }
 void LoginWidget::fail(QString m)
