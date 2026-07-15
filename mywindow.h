@@ -79,6 +79,7 @@ private slots:
 
 signals:
     void sendjson(QJsonObject json);
+    void requestInitData();
 
 protected:
     //void showEvent(QShowEvent *event);

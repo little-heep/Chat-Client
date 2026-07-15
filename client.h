@@ -46,6 +46,7 @@ signals:
     void acceptfriend(FriendInfo finfo);
     void registerSuccess(uint userid, QString message);
     void registerFail(QString message);
+
 public slots:
     void init();
 
@@ -53,6 +54,7 @@ public slots:
     void onsendmessage(QJsonObject message);
     void onsendfile(const QString filename,const QString sendid,const QString receiveid);
 
+    void sendInitData();
 private:
     QString aimip;
     QString aimport;

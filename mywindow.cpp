@@ -79,10 +79,12 @@ MyWindow::MyWindow(QString id,QString name,client *c,QThread *thread,QWidget *pa
             stackedWidget, &QStackedWidget::setCurrentIndex);
 
     connect(clen,&client::updatefriend,this,&MyWindow::showfriend);
+    qDebug()<<"showfriend信号连接";
 
     connect(clen,&client::addfriendrequest,this,&MyWindow::onaddfriendrequest);
     connect(clen,&client::addfriendresult,this,&MyWindow::onaddfriendresult);
     connect(clen,&client::acceptfriend,this,&MyWindow::onacceptfriend);
+    connect(this,&MyWindow::requestInitData,clen,&client::sendInitData);
 
     // 默认选中第一个菜单项
     menuList->setCurrentRow(0);
@@ -94,6 +96,8 @@ MyWindow::MyWindow(QString id,QString name,client *c,QThread *thread,QWidget *pa
     setCentralWidget(centralWidget);
 
     setupStyles();
+
+    emit requestInitData();
 
 }
 
@@ -166,21 +170,19 @@ QWidget* MyWindow::createContentPage(const QString &title) {
  void MyWindow::showfriend(FriendListMessage f)
 {
      qDebug()<<"showfriend begin";
-    // 检查 msgwidget 是否为空，如果不为空则初始化好友
-    if(msgwidget != nullptr) {
-        msgwidget->initfriend(f);
-        qDebug() << "msgwidget初始化好友";
-    } else {
-        qDebug() << "msgwidget为空";
-    }
+
     
     // 检查 allfriend 是否为空，如果不为空则添加好友项
-    if(allfriend != nullptr) {
-        for (const auto& friendInfo : f.friends) {
-            FriendListItem *friendItem = new FriendListItem(friendInfo);
-            if(friendItem != nullptr) {
-                allfriend->addItem(friendItem);
-            }
+    if(allfriend != nullptr && msgwidget != nullptr) {
+        allfriend->clear();
+
+        msgwidget->initfriend(f);
+
+        for (const auto &friendInfo : f.friends)
+        {
+            auto *item = new FriendListItem(friendInfo);
+
+            allfriend->addItem(item);
         }
     } else {
         qDebug() << "allfriend为空";

@@ -165,8 +165,6 @@ void client::processMessage(const QByteArray &jsonData){
     if (type == "friend_list") {
         friendlist = parseFriendListMessage(jsonData);
         friendlist.print();
-        qDebug()<<"from client";
-        emit updatefriend(friendlist);
     }
     else if(type=="message")
     {   //接收消息，处理json数据，然后显示
@@ -202,6 +200,10 @@ void client::processMessage(const QByteArray &jsonData){
     }
 }
 
+void client::sendInitData()
+{
+    emit updatefriend(friendlist);
+}
 
 void client::acceptfriendresponse(const QByteArray & jsonData)
 {

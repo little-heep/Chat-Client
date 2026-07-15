@@ -263,7 +263,6 @@ void LoginWidget::success(QString id)
     w=new MyWindow(id,usernameEdit->text(),c,networkThread);
 
     w->show();
-    //QTimer::singleShot(1000, this, &QObject::deleteLater);
     this->deleteLater();
 }
 void LoginWidget::fail(QString m)

@@ -20,6 +20,7 @@ struct FriendInfo {
                  << "Online:" << online;
     }
 };
+Q_DECLARE_METATYPE(FriendInfo)
 
 struct FriendListMessage {
     QString type;
@@ -32,6 +33,7 @@ struct FriendListMessage {
         }
     }
 };
+Q_DECLARE_METATYPE(FriendListMessage)
 
 // 定义发送消息结构体
 struct Message {
@@ -41,7 +43,6 @@ struct Message {
     QString content;       // 消息内容
     QDateTime sendTime;    // 发送时间
 };
-
-
+Q_DECLARE_METATYPE(Message)
 
 #endif // ALLSTRUCTS_H
