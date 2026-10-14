@@ -1,253 +1,194 @@
-# 🌟 ConnectionClient - Qt即时通讯客户端
+# ConnectionClient - Qt 即时通讯客户端
 
-<div align="center">
-
-![Qt](https://img.shields.io/badge/Qt-5.15.2-green.svg)
-![MySQL](https://img.shields.io/badge/MySQL-Database-blue.svg)
-![C++](https://img.shields.io/badge/C++-17-orange.svg)
-
-
-*一个功能丰富、界面友好的即时通讯客户端应用*
-
-</div>
-
-## 📖 项目简介
-
-ConnectionClient 是一个基于 Qt 框架和 MySQL 数据库开发的现代化即时通讯客户端。它提供了完整的社交通讯功能，包括用户管理、好友系统、实时聊天、文件传输等核心特性。项目采用客户端-服务器架构，支持多用户并发通信。
-
-## ✨ 核心功能
-
-### 🔐 用户认证系统
-- **安全登录** - 支持用户名/密码登录，基于TCP协议的安全通信
-- **账户管理** - 用户可以实时修改昵称和密码
-
-### 👥 好友管理系统
-- **智能搜索** - 支持通过用户ID或用户名搜索好友
-- **好友申请** - 完整的好友请求-确认流程
-- **好友列表** - 实时显示所有好友状态和在线情况
-- **好友分组** - 清晰的联系人界面管理
-
-### 💬 即时通讯功能
-- **实时聊天** - 基于TCP的低延迟一对一聊天
-- **聊天窗口** - 独立的聊天界面，支持多窗口聊天
-- **消息记录** - SQLite本地数据库存储聊天历史
-- **离线消息** - 自动接收和处理离线期间的消息
-- **消息状态** - 实时显示消息发送和接收状态
-
-### 📁 文件传输系统
-- **文件发送** - 支持发送各种类型的文件
-- **文件接收** - 自动保存到ReceivedFiles目录
-- **传输管理** - 完整的文件传输状态跟踪
-- **文件预览** - 支持文件信息显示和管理
-
-### 🎨 用户界面
-- **现代化设计** - 美观的粉色主题界面
-- **响应式布局** - 左侧菜单栏+右侧内容区域
-- **多页面管理** - 消息、联系人、个人信息等多个功能页面
-- **自定义字体** - 集成自定义字体文件，提升视觉体验
-
-## 🏗️ 技术架构
-
-### 前端技术栈
-- **Qt 5.15.2** - 跨平台GUI框架，提供原生界面体验
-- **C++17** - 现代C++标准，确保代码性能和可维护性
-- **TCP Socket** - 可靠的网络通信协议
-
-### 后端支持
-- **MySQL** - 稳定可靠的关系型数据库
-- **自定义协议** - 高效的客户端-服务器通信协议
-
-### 核心模块
-
-```
-ConnectionClient/
-├── 🎯 核心模块
-│   ├── main.cpp              # 应用程序入口
-│   ├── mywindow.cpp/h        # 主窗口界面和菜单管理
-│   └── client.cpp/h          # TCP网络通信客户端
-├── 🔑 用户认证模块  
-│   ├── loginwidget.cpp/h     # 登录界面
-│   └── personalwidget.cpp/h # 个人信息编辑页面
-├── 💬 聊天通信模块
-│   ├── messagewidget.cpp/h   # 消息主页面
-│   ├── chatwidget.cpp/h      # 聊天窗口
-│   ├── linemessage.cpp/h     # 消息气泡组件
-│   └── filelinemessage.cpp/h # 文件消息组件
-├── 👥 好友管理模块
-│   └── friendlistitem.cpp/h  # 好友列表项组件
-├── 📁 文件处理模块
-│   └── filehandle.cpp/h      # 文件传输处理
-├── 🗃️ 数据管理模块
-│   ├── dbmanage.cpp/h        # SQLite数据库管理
-│   └── allstructs.h          # 数据结构定义
-├── 🔧 工具组件
-│   └── passwordeditmessagebox.cpp/h  # 密码编辑对话框
-└── 🎨 资源文件
-    ├── images/               # 界面图标资源
-    ├── font/                 # 自定义字体文件
-    └── static.qrc            # Qt资源文件
-```
-
-## 🚀 快速开始
-
-### 环境要求
-
-- **Qt 5.15.2** 或更高版本
-- **MinGW 32-bit** 编译器
-- **MySQL 5.7+** 数据库
-- **Windows 10/11** 操作系统
-
-### 安装步骤
-
-1. **克隆项目**
-   ```bash
-   git clone [https://github.com/little-heep/Chat-Client.git]
-   cd ConnectionClient
-   ```
-
-2. **配置数据库**
-   ```sql
-   -- 创建数据库和必要的表结构
-   CREATE DATABASE connection_db;
-   -- 导入数据库结构文件
-   ```
-
-3. **编译项目**
-   ```bash
-   # 使用Qt Creator打开ConnectionClient.pro
-   # 或使用命令行编译
-   qmake ConnectionClient.pro
-   make
-   ```
-
-4. **运行应用**
-   ```bash
-   ./ConnectionClient.exe
-   ```
-
-## 🎮 使用指南
-
-### 首次使用
-
-1. **启动应用** - 双击运行程序
-2. **用户登录** - 输入用户名和密码进行登录
-3. **主界面** - 登录成功后进入主聊天界面
-
-### 主要操作
-
-#### 👤 管理账户
-- 点击设置按钮修改用户名或密码
-- 系统会自动验证新信息的有效性
-
-#### 🔍 添加好友
-1. 使用搜索功能查找用户
-2. 点击搜索结果中的用户
-3. 发送好友申请
-4. 等待对方确认
-
-#### 💬 开始聊天
-1. 在好友列表中选择联系人
-2. 双击好友头像打开聊天窗口
-3. 输入消息并发送
-4. 支持表情、文件等多媒体内容
-
-#### 📁 文件传输
-1. 在聊天窗口中点击文件按钮
-2. 选择要发送的文件
-3. 确认发送，等待传输完成
-
-## 🔧 配置说明
-
-### 数据库配置
-项目使用SQLite作为本地数据库，自动管理聊天记录和用户数据：
-```cpp
-// DBManage类负责数据库初始化和管理
-// 数据库文件：chat.db
-// 主要表结构：
-// - 用户信息表
-// - 聊天记录表  
-// - 好友关系表
-```
-
-### 网络通信协议
-基于JSON格式的自定义协议：
-```json
-{
-  "type": "消息类型",
-  "data": "消息内容",
-  "sender": "发送者ID",
-  "receiver": "接收者ID"
-}
-```
-
-## 🛠️ 开发指南
-
-### 项目架构说明
-- **mywindow.cpp/h** - 主窗口管理器，负责界面布局和页面切换
-- **client.cpp/h** - 网络通信核心，处理TCP连接和消息收发
-- **loginwidget.cpp/h** - 登录界面，处理用户身份验证
-- **chatwidget.cpp/h** - 聊天窗口，实现实时消息交互
-- **dbmanage.cpp/h** - 数据库管理器，处理本地数据存储
-- **messagewidget.cpp/h** - 消息页面，管理聊天列表和好友搜索
-- **allstructs.h** - 数据结构定义，包含所有通信协议结构
-
-### 关键设计模式
-- **信号槽机制** - Qt特有的事件处理机制，实现松耦合通信
-- **MVC架构** - 分离界面、逻辑和数据层
-- **组件化设计** - 每个功能模块独立封装，便于维护和扩展
-
-### 扩展功能建议
-项目采用模块化设计，便于添加新功能：
-- **群聊系统** - 基于现有聊天框架扩展多人聊天
-- **语音通话** - 集成音频编解码库
-- **视频通话** - 添加摄像头和视频流处理
-- **表情包系统** - 扩展消息类型支持图片表情
-- **消息加密** - 添加端到端加密保护隐私
-- **主题切换** - 扩展现有样式系统支持多主题
-
-## 🐛 故障排除
-
-### 常见问题
-
-**Q: 无法连接到服务器**
-- 检查网络连接
-- 确认服务器是否正常运行
-- 验证端口是否被防火墙阻止
-
-**Q: 登录失败**
-- 确认用户名和密码正确
-- 检查数据库连接状态
-- 查看服务器日志
-
-**Q: 消息发送失败**
-- 检查网络稳定性
-- 确认好友在线状态
-- 重启应用程序
-
-## 📈 性能特点
-
-- ⚡ **低延迟**: 优化的网络协议确保消息快速传递
-- 🔒 **高安全性**: 数据传输加密，保护用户隐私
-- 💾 **低内存占用**: 高效的内存管理，流畅运行
-- 🔄 **自动重连**: 网络中断后自动恢复连接
-- 📱 **响应式界面**: 适配不同屏幕尺寸
-
-## 🤝 贡献指南
-
-我们欢迎所有形式的贡献！
-
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
+基于 C++ 与 Qt (Widgets) 开发的桌面即时通讯（IM）客户端，界面采用清爽的粉色主题。配合配套的 TCP 服务端使用，支持账号注册登录、好友搜索添加、实时单聊、文件断点/分块传输以及本地历史消息持久化。
 
 ---
 
-<div align="center">
+## 💡 这是个什么项目？
 
-**⭐ 如果这个项目对您有帮助，请给我们一个星标！**
+本项目是一个典型的 **C/S 架构即时通讯客户端**：
+- **客户端负责**：用户交互界面、网络多线程通信收发、文件读取与下载存储、本地 SQLite 聊天历史记录管理。
+- **服务端交互**：基于 TCP Socket 协议与后端服务器长连接，传输基于自定义数据包协议的 JSON 控制指令与二进制文件流。
 
-[报告Bug](../../issues) · [请求功能](../../issues) · [项目主页](../../)
+> **注意**：本项目为**客户端源码**，需配合后端通讯服务端运行。如果本地测试，请确保服务端已启动并正确配置 IP 端口。
 
-</div>
+---
+
+## 🎯 核心功能
+
+1. **账号系统**
+   - **注册与登录**：支持新用户注册，系统自动下发专属用户 ID；支持用户名/密码登录。
+   - **个人信息管理**：支持在线修改个人昵称与登录密码。
+
+2. **好友系统**
+   - **精准搜索**：支持按用户 ID 或昵称搜索用户并发送添加好友请求。
+   - **请求审批**：收到好友申请时弹窗提示，支持一键同意或拒绝。
+   - **好友列表**：展示全部好友、实时在线状态及信息查看。
+
+3. **即时聊天**
+   - **一对一单聊**：类微信/QQ 的气泡式消息对话界面（头像、时间戳、左右气泡）。
+   - **本地聊天记录**：基于本地 SQLite 数据库（`chat.db`）自动存储消息，再次打开会话自动还原历史记录。
+
+4. **文件传输**
+   - **文件发送**：支持任意类型文件分块（64KB Chunk）流式发送，不限制文件格式。
+   - **文件接收**：接收到的文件自动存放于程序运行目录下的 `ReceivedFiles/` 文件夹（重名自动按序号重命名）。
+   - **文件消息卡片**：聊天窗口展示文件名称与格式化大小（KB/MB/GB），点击直接在系统文件管理器中打开文件所在目录。
+
+---
+
+## 🛠️ 技术亮点
+
+- **UI 与网络通信多线程分离**：网络核心（`client`）通过 `moveToThread` 运行在独立的 `QThread` 工作线程中，收发大文件或网络波动时主界面完全不卡顿。
+- **自定义 TCP 二进制通信协议**：设计了固定 8 字节包头（`Type` 4 字节 + `Length` 4 字节）+ 动态包体，彻底解决 TCP 通信中的粘包与拆包问题。
+- **轻量本地存储**：无需额外安装 MySQL 等外部数据库，本地直接通过 Qt 驱动的 SQLite 文件数据库读写聊天记录。
+
+---
+
+## 📡 数据通信协议与数据结构
+
+客户端与服务端之间采用 **TCP 长连接**，所有数据传输均封装为**带 8 字节定长包头**的自定义协议帧，彻底规避 TCP 粘包与半包问题。
+
+### 1. 底层数据包封包格式 (TCP Frame)
+
+| 字节偏移 | 字段名 | 数据类型 | 字节序 | 作用与说明 |
+| :--- | :--- | :--- | :--- | :--- |
+| `0 ~ 3` | `Type` | `quint32` (4 字节) | 大端 (Big-Endian) | 包类型标识：<br>• `1`：JSON 业务指令报文<br>• `2`：二进制文件数据块<br>• `3`：文件元信息头 |
+| `4 ~ 7` | `Length` | `quint32` (4 字节) | 大端 (Big-Endian) | 后续包体（Payload）的有效字节长度 |
+| `8 ~ ...`| `Payload` | 二进制 / UTF-8 | - | 具体载荷内容（紧凑 JSON 字符串或原始文件数据流） |
+
+---
+
+### 2. 客户端发送的数据结构 (Client ➔ Server)
+
+| 业务场景 | 报文标识 (`type`) | 字段结构 | 示例 Payload | 说明 |
+| :--- | :--- | :--- | :--- | :--- |
+| **用户注册** | `register` | `name`: string<br>`pwd`: string | `{"type":"register","name":"alice","pwd":"123"}` | 发起新用户注册 |
+| **用户登录** | `login` | `name`: string<br>`pwd`: string | `{"type":"login","name":"alice","pwd":"123"}` | 发起登录验证 |
+| **发送文本消息** | `message` | `sendid`: string<br>`receiveid`: string<br>`content`: string<br>`sendTime`: string (ISO) | `{"type":"message","sendid":"10001","receiveid":"10002","content":"你好","sendTime":"2026-10-14T15:00:00.000"}` | 发送单聊文本消息 |
+| **按 ID 申请好友** | `addfriend` | `addname`: `""`<br>`addid`: string | `{"type":"addfriend","addname":"","addid":"10002"}` | 根据用户数字 ID 发起好友申请 |
+| **按昵称申请好友** | `addfriend` | `addname`: string<br>`addid`: `""` | `{"type":"addfriend","addname":"张三","addid":""}` | 根据用户昵称发起好友申请 |
+| **同意好友申请** | `acceptfriend`| `addname`: string | `{"type":"acceptfriend","addname":"张三"}` | 接收方同意对方的好友申请 |
+| **修改个人昵称** | `changename` | `name`: string | `{"type":"changename","name":"新昵称"}` | 修改当前用户的昵称 |
+| **修改登录密码** | `changepwd` | `oldpwd`: string<br>`newpwd`: string | `{"type":"changepwd","oldpwd":"123","newpwd":"456"}` | 修改当前用户的登录密码 |
+| **发送文件元信息** | *(底层 Type 3)* | `filename`: string<br>`size`: int64<br>`sendid`: string<br>`receiveid`: string | `{"filename":"demo.zip","size":1048576,"sendid":"10001","receiveid":"10002"}` | 开始发送文件前通知对方准备接收 |
+| **发送文件数据块** | *(底层 Type 2)* | 原始二进制数据流 | 每次发送最大 64KB (`64 * 1024` 字节) 数据块 | 流式循环读取文件并发送分块 |
+
+---
+
+### 3. 客户端接收与解析的数据结构 (Server ➔ Client)
+
+| 业务场景 | 报文标识 (`type`) | 字段结构 | 示例 Payload | 客户端解析与处理行为 |
+| :--- | :--- | :--- | :--- | :--- |
+| **注册响应** | `register_response` | `status`: string (`"success"`/`"fail"`)<br>`message`: string<br>`userid`: int | `{"type":"register_response","status":"success","message":"注册成功","userid":10001}` | 弹窗展示系统分配的数字 UserID，切回登录界面 |
+| **登录响应** | `login_response` | `success`: bool<br>`message`: string | `{"type":"login_response","success":true,"message":"ok:10001"}` | 验证成功后提取用户 ID（`message.mid(3)`），启动主界面 |
+| **好友列表下发** | `friend_list` | `friends`: Array of Object:<br>• `user_id`: string<br>• `name`: string<br>• `status`: int<br>• `online`: bool | `{"type":"friend_list","friends":[{"user_id":"10002","name":"李四","status":0,"online":true}]}` | 解析并初始化所有好友项，创建对应的会话和聊天窗口 |
+| **接收聊天消息** | `message` | `sendid`: string<br>`receiveid`: string<br>`content`: string<br>`sendTime`: string (ISO) | `{"type":"message","sendid":"10002","receiveid":"10001","content":"在吗？","sendTime":"2026-10-14T15:00:00.000"}` | 追加聊天气泡，并同步插入本地 SQLite 数据库（`chatlog`） |
+| **加好友申请反馈** | `addfriend_response` | `status`: string (`"success"`/`"fail"`)<br>`message`: string | `{"type":"addfriend_response","status":"success","message":"好友请求已发送"}` | 弹窗提示用户请求是否已成功到达服务端 |
+| **收到新好友申请** | `addfriend_request` | `addid`: string<br>`addname`: string<br>`status`: int<br>`online`: bool | `{"type":"addfriend_request","addid":"10003","addname":"王五","status":0,"online":true}` | 弹出确认提示框询问是否同意添加该好友 |
+| **同意好友通知** | `acceptfriend_response` | `userid`: string<br>`username`: string<br>`userstatus`: int<br>`online`: bool | `{"type":"acceptfriend_response","userid":"10003","username":"王五","userstatus":0,"online":true}` | 将新通过的好友动态插入联系人与会话列表 |
+| **修改昵称反馈** | `changename_response` | `status`: string (`"success"`/`"fail"`) | `{"type":"changename_response","status":"success"}` | 提示昵称修改结果，并刷新界面 |
+| **修改密码反馈** | `changepwd_response` | `status`: string (`"success"`/`"fail"`)<br>`message`: string | `{"type":"changepwd_response","status":"success","message":"修改成功"}` | 弹窗反馈密码更新结果 |
+| **接收文件通知** | *(底层 Type 3 或)*<br>`file_notify` | `filename`: string<br>`size`: int64<br>`sendid`: string | `{"filename":"demo.zip","size":1048576,"sendid":"10002"}` | 在 `ReceivedFiles/` 目录中建立空文件（重名自动顺延），准备接收数据流 |
+| **接收文件数据块** | *(底层 Type 2)* | 原始二进制数据流 | 每次接收的数据分块 | 流式写入目标文件；当接收字节达到 `size` 时关闭文件并在聊天气泡区生成文件卡片 |
+
+---
+
+### 4. 客户端本地 C++ 核心数据结构与存储
+
+#### 核心结构体 (`allstructs.h`)
+| 结构体名 | 成员属性 | 描述 |
+| :--- | :--- | :--- |
+| `FriendInfo` | `QString userID`<br>`QString name`<br>`int status`<br>`bool online` | 好友信息实体，注册为 Qt 元对象（`Q_DECLARE_METATYPE`）以便信号槽跨线程传递 |
+| `FriendListMessage` | `QString type`<br>`QList<FriendInfo> friends` | 好友列表复合数据体 |
+| `Message` | `QString type`<br>`QString sendid`<br>`QString receiveid`<br>`QString content`<br>`QDateTime sendTime` | 聊天消息实体（普通文字或以 `file:` 为前缀的文件记录） |
+
+#### 本地 SQLite 数据表 (`chat.db` ➔ `chatlog`)
+| 字段名 | 字段类型 | 约束 | 说明 |
+| :--- | :--- | :--- | :--- |
+| `id` | `INTEGER` | `PRIMARY KEY AUTOINCREMENT` | 自增主键 |
+| `sendid` | `varchar(20)` | - | 发送者用户 ID |
+| `receiveid` | `varchar(20)` | - | 接收者用户 ID |
+| `content` | `TEXT` | - | 消息内容（普通文本或 `file:本地全路径`） |
+| `sendTime` | `varchar(20)` | - | 消息发送时间戳（ISO 8601 格式） |
+
+---
+
+## 📦 目录结构
+
+```text
+ConnectionClient/
+├── main.cpp                  # 程序入口，高 DPI 适配与元类型注册
+├── ConnectionClient.pro      # Qt 项目工程文件 (qmake)
+│
+├── client.cpp / .h           # 网络底层核心（TCP Socket、线程收发、协议打包/解包）
+├── allstructs.h              # 全局数据结构（用户信息、消息体、好友列表）
+├── dbmanage.cpp / .h         # 本地 SQLite 数据库操作封装（chat.db）
+├── filehandle.cpp / .h       # JSON 与 Message 结构体序列化/转换处理
+│
+├── loginwidget.cpp / .h      # 登录/注册界面（无边框圆角、阴影动效、抖动提示）
+├── mywindow.cpp / .h         # 主界面（侧边导航菜单、堆叠多页面调度）
+├── messagewidget.cpp / .h    # 消息会话主页面（左侧会话列表 + 搜索 + 右侧聊天区）
+├── chatwidget.cpp / .h       # 单聊窗口组件（消息展示区、输入框、文件发送）
+├── linemessage.cpp / .h      # 文本消息气泡组件
+├── filelinemessage.cpp / .h  # 文件消息气泡组件（展示文件大小，点击打开路径）
+├── friendlistitem.cpp / .h   # 好友列表项自定义控件
+├── personalwidget.cpp / .h   # 个人资料与修改密码/昵称页面
+│
+├── images/                   # 界面图标资源（发送、头像、文件等）
+├── font/                     # 自定义界面字体 (fonttt.ttf)
+└── static.qrc                # Qt 资源集合文件
+```
+
+---
+
+## 🚀 编译与运行
+
+### 1. 环境准备
+- **操作系统**：Windows 10 / 11
+- **开发工具**：Qt Creator（推荐）
+- **Qt 版本**：Qt 5.12 及以上（包含 5.15.2，支持 Qt 6，需安装 `Widgets`, `Network`, `Sql` 模块）
+- **编译器**：MinGW (32-bit / 64-bit) 或 MSVC
+
+### 2. 配置服务器地址（重要）
+在本地运行前，请先指定客户端连接的服务端 IP 和端口：
+打开 [client.cpp](client.cpp#L34-L35)，修改第 34~35 行：
+```cpp
+// 替换为您实际的服务端 IP 和监听端口
+aimip = "127.0.0.1";  // 若本地测试改为 127.0.0.1，或填写实际服务器公网/局域网IP
+aimport = "12345";    // 对应服务端的监听端口
+```
+
+### 3. 构建运行
+- **使用 Qt Creator（推荐）**：
+  1. 打开 Qt Creator，点击 `打开项目`，选择 `ConnectionClient.pro`。
+  2. 选择构建套件（如 Desktop Qt 5.15.2 MinGW）。
+  3. 点击左下角绿色箭头 **运行**（`Ctrl + R`）。
+- **命令行编译**：
+  ```bash
+  cd ConnectionClient
+  qmake ConnectionClient.pro
+  mingw32-make
+  # 运行生成的可执行文件
+  ./debug/ConnectionClient.exe  # 或 release 目录下的 exe
+  ```
+
+---
+
+## 📖 使用说明
+
+1. **新用户注册**：
+   - 首次启动程序显示登录窗口，点击下方的 **“注册账号”** 切换至注册模式。
+   - 输入心仪的用户名与密码，点击“注 册”。
+   - 注册成功后系统弹窗提示您的专属数字 ID，随后切回登录模式。
+2. **账号登录**：
+   - 输入注册时的用户名与密码，点击“登 录”即可进入主界面。
+3. **添加好友**：
+   - 在左侧会话栏顶部的搜索框中输入对方的 **用户 ID** 或 **昵称**，点击“搜索”。
+   - 若本地未添加该好友，会弹出请求添加的确认对话框，点击“是”发送申请。
+   - 对方客户端会收到弹窗提示，点击同意后双方自动加入好友列表。
+4. **发送消息与文件**：
+   - 在左侧列表中点击对应好友打开聊天窗口。
+   - 输入文本后点击右下角 **“发送”** 或回车发送消息。
+   - 点击 **“发送文件”** 可选择任意本地文件发送；对方收到后会显示文件卡片，文件自动保存在软件目录下的 `ReceivedFiles/` 目录中，点击卡片上的图标可直接在文件管理器中定位该文件。
+5. **修改个人资料**：
+   - 点击左侧侧边栏的 **“个人信息”** 菜单项，可以更新昵称或修改登录密码。
